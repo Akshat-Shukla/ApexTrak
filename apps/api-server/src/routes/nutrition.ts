@@ -2,7 +2,13 @@ import { Router } from "express";
 import { getAuth } from "@clerk/express";
 import { db, nutritionTable } from "@fitness/db";
 import { eq, and, desc } from "drizzle-orm";
-import { LogNutritionBody, ListNutritionQueryParams, DeleteNutritionParams } from "@fitness/api-zod";
+import { LogNutritionBody, DeleteNutritionParams } from "@fitness/api-zod";
+import { z } from "zod";
+
+// Query params arrive as strings — parse date as string, not Date object
+const ListNutritionQueryParams = z.object({
+  date: z.string().optional(),
+});
 
 const router = Router();
 

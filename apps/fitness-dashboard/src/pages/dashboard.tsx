@@ -249,6 +249,7 @@ export function DashboardPage() {
                   </div>
                   <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
                     <motion.div
+                      key={stats?.goalProgress ?? "loading"}
                       className="h-full rounded-full bg-primary"
                       initial={{ width: 0 }}
                       animate={{ width: `${stats?.goalProgress ?? 0}%` }}
