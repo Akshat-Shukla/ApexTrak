@@ -43,12 +43,9 @@ function MacroChip({ label, value, target, color }: { label: string; value: numb
         <span className={`text-xs font-bold ${color}`}>{Math.round(value)}g</span>
       </div>
       <div className="h-1.5 rounded-full bg-muted/30 overflow-hidden">
-        <motion.div
-          key={pct}
-          className={`h-full rounded-full ${color.replace("text-", "bg-")}`}
-          initial={{ width: "0%" }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+        <div
+          className={`h-full rounded-full transition-all duration-700 ease-out ${color.replace("text-", "bg-")}`}
+          style={{ width: `${pct}%` }}
         />
       </div>
       <div className="text-[10px] text-muted-foreground mt-1.5">{target}g target</div>
@@ -117,7 +114,6 @@ export function NutritionPage() {
     <AppLayout>
       <PageTransition>
         <div className="space-y-6">
-          {/* Header + Date Nav */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Nutrition</h1>
@@ -170,7 +166,6 @@ export function NutritionPage() {
             </Dialog>
           </div>
 
-          {/* Date navigation */}
           <div className="flex items-center gap-2 bg-card/20 border border-border/30 rounded-xl px-4 py-2.5 w-fit">
             <button
               className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
@@ -190,14 +185,13 @@ export function NutritionPage() {
             </button>
           </div>
 
-          {/* Calorie ring + macros */}
           <div className="bg-card/20 border border-border/30 rounded-2xl p-5">
             <div className="flex items-center gap-6 mb-5">
-              {/* Calorie ring */}
               <div className="relative w-24 h-24 shrink-0">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="40" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
                   <motion.circle
+                    key={totals.calories}
                     cx="50" cy="50" r="40"
                     fill="transparent"
                     stroke="currentColor"
@@ -232,7 +226,6 @@ export function NutritionPage() {
                 </div>
               </div>
             </div>
-            {/* Macro bars */}
             <div className="flex gap-2.5">
               <MacroChip label="Protein" value={totals.protein} target={PROTEIN_TARGET} color="text-blue-400" />
               <MacroChip label="Carbs" value={totals.carbs} target={CARBS_TARGET} color="text-amber-400" />
@@ -240,7 +233,6 @@ export function NutritionPage() {
             </div>
           </div>
 
-          {/* Food log */}
           <div>
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Food Log</h2>
             {isLoading ? (
@@ -256,10 +248,7 @@ export function NutritionPage() {
               <StaggerList className="space-y-2">
                 {entries.map(entry => (
                   <StaggerItem key={entry.id}>
-                    <motion.div
-                      whileHover={{ x: 2 }}
-                      className="group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-card/30 border border-border/25 hover:border-primary/20 hover:bg-card/50 transition-colors"
-                    >
+                    <div className="group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-card/30 border border-border/25 hover:border-primary/20 hover:bg-card/50 transition-colors">
                       <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <Utensils className="h-4 w-4" />
                       </div>
@@ -281,7 +270,7 @@ export function NutritionPage() {
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
-                    </motion.div>
+                    </div>
                   </StaggerItem>
                 ))}
               </StaggerList>

@@ -6,9 +6,7 @@ import { format } from "date-fns";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "framer-motion";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -71,7 +69,7 @@ export function WorkoutsPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListWorkoutsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetDashboardStatsQueryKey() });
-          toast({ title: "Workout logged! 💪" });
+          toast({ title: "Workout logged!" });
           setIsDialogOpen(false);
           form.reset({ type: "running", durationMinutes: 30, caloriesBurned: 300, date: format(new Date(), "yyyy-MM-dd"), notes: "" });
         },
@@ -104,7 +102,6 @@ export function WorkoutsPage() {
     <AppLayout>
       <PageTransition>
         <div className="space-y-7">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Workouts</h1>
@@ -185,14 +182,13 @@ export function WorkoutsPage() {
             </Dialog>
           </div>
 
-          {/* Quick stats */}
           {!isLoading && workouts && workouts.length > 0 && (
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: "Total Sessions", value: workouts.length, icon: Activity, color: "text-primary" },
                 { label: "Total Minutes", value: totalMinutes, icon: Timer, color: "text-blue-400" },
                 { label: "Calories Burned", value: totalCalories.toLocaleString(), icon: Flame, color: "text-rose-400" },
-              ].map((stat) => (
+              ].map(stat => (
                 <div key={stat.label} className="bg-card/30 border border-border/30 rounded-xl px-4 py-3 flex items-center gap-3">
                   <stat.icon className={`h-5 w-5 ${stat.color} shrink-0`} />
                   <div>
@@ -204,7 +200,6 @@ export function WorkoutsPage() {
             </div>
           )}
 
-          {/* Workout list */}
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-[88px] w-full rounded-xl" />)}
@@ -223,10 +218,7 @@ export function WorkoutsPage() {
                 const meta = getWorkoutMeta(workout.type);
                 return (
                   <StaggerItem key={workout.id}>
-                    <motion.div
-                      whileHover={{ x: 2 }}
-                      className="group relative flex items-center gap-4 px-5 py-4 rounded-xl bg-card/30 border border-border/30 hover:border-primary/20 hover:bg-card/50 transition-colors cursor-default"
-                    >
+                    <div className="group relative flex items-center gap-4 px-5 py-4 rounded-xl bg-card/30 border border-border/30 hover:border-primary/20 hover:bg-card/50 transition-colors cursor-default">
                       <div className={`h-11 w-11 rounded-xl ${meta.bg} flex items-center justify-center shrink-0`}>
                         <meta.icon className={`h-5 w-5 ${meta.color}`} />
                       </div>
@@ -250,7 +242,7 @@ export function WorkoutsPage() {
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
-                    </motion.div>
+                    </div>
                   </StaggerItem>
                 );
               })}

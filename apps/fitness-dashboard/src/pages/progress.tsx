@@ -7,7 +7,6 @@ import { Scale, Plus, TrendingDown, TrendingUp, Minus, Activity, Flame } from "l
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,23 +24,21 @@ const weightSchema = z.object({
 });
 
 const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-card border border-border/50 px-4 py-3 rounded-xl shadow-2xl">
-        <p className="text-xs font-semibold text-muted-foreground mb-2">
-          {(() => { try { return format(parseISO(label), "MMM d"); } catch { return label; } })()}
-        </p>
-        {payload.map((entry: any, i: number) => (
-          <div key={i} className="flex items-center gap-2.5 text-sm">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-            <span className="text-muted-foreground text-xs">{entry.name}:</span>
-            <span className="font-bold text-xs">{entry.value}</span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-card border border-border/50 px-4 py-3 rounded-xl shadow-2xl">
+      <p className="text-xs font-semibold text-muted-foreground mb-2">
+        {(() => { try { return format(parseISO(label), "MMM d"); } catch { return label; } })()}
+      </p>
+      {payload.map((entry: any, i: number) => (
+        <div key={i} className="flex items-center gap-2.5 text-sm">
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+          <span className="text-muted-foreground text-xs">{entry.name}:</span>
+          <span className="font-bold text-xs">{entry.value}</span>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const formatDate = (d: string) => { try { return format(parseISO(d), "MMM d"); } catch { return d; } };
@@ -77,19 +74,17 @@ export function ProgressPage() {
     );
   };
 
-  // Weight trend stats
   const weightChange = weightHistory && weightHistory.length >= 2
     ? +(weightHistory[weightHistory.length - 1].weightKg - weightHistory[0].weightKg).toFixed(1)
     : null;
 
-  const totalWorkoutsWeek = weeklyStats?.reduce((s, d) => s + (d.workoutCount ?? 0), 0) ?? 0;
+  const totalActiveMinutes = weeklyStats?.reduce((s, d) => s + (d.workoutMinutes ?? 0), 0) ?? 0;
   const totalCaloriesWeek = weeklyStats?.reduce((s, d) => s + (d.caloriesBurned ?? 0), 0) ?? 0;
 
   return (
     <AppLayout>
       <PageTransition>
         <div className="space-y-6">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Progress</h1>
@@ -130,18 +125,17 @@ export function ProgressPage() {
             </Dialog>
           </div>
 
-          {/* Weekly summary chips */}
           <StaggerList className="grid grid-cols-3 gap-3">
             {[
-              { label: "Workouts This Week", value: totalWorkoutsWeek, icon: Activity, color: "text-primary" },
+              { label: "Active Minutes", value: totalActiveMinutes, icon: Activity, color: "text-primary" },
               { label: "Calories Burned", value: `${totalCaloriesWeek.toLocaleString()} kcal`, icon: Flame, color: "text-rose-400" },
               {
                 label: "Weight Trend",
                 value: weightChange == null ? "—" : `${weightChange > 0 ? "+" : ""}${weightChange} kg`,
                 icon: weightChange == null ? Minus : weightChange < 0 ? TrendingDown : TrendingUp,
-                color: weightChange == null ? "text-muted-foreground" : weightChange < 0 ? "text-primary" : "text-rose-400"
+                color: weightChange == null ? "text-muted-foreground" : weightChange < 0 ? "text-primary" : "text-rose-400",
               },
-            ].map((s) => (
+            ].map(s => (
               <StaggerItem key={s.label}>
                 <div className="bg-card/30 border border-border/30 rounded-xl px-4 py-3 flex items-center gap-3">
                   <s.icon className={`h-5 w-5 ${s.color} shrink-0`} />
@@ -154,9 +148,7 @@ export function ProgressPage() {
             ))}
           </StaggerList>
 
-          {/* Charts */}
           <div className="space-y-5">
-            {/* Weight Trend */}
             <Card className="bg-card/20 border-border/30">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
@@ -201,7 +193,6 @@ export function ProgressPage() {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Caloric Balance */}
               <Card className="bg-card/20 border-border/30">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold">Caloric Balance</CardTitle>
@@ -228,7 +219,6 @@ export function ProgressPage() {
                 </CardContent>
               </Card>
 
-              {/* Active Minutes */}
               <Card className="bg-card/20 border-border/30">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold">Active Minutes</CardTitle>

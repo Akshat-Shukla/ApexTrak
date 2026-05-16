@@ -26,11 +26,7 @@ function StatCard({ label, value, sub, icon: Icon, color, loading }: {
       </div>
       <div className="min-w-0">
         <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider truncate">{label}</p>
-        {loading ? (
-          <Skeleton className="h-7 w-16 mt-1" />
-        ) : (
-          <p className="text-2xl font-bold leading-tight mt-0.5">{value}</p>
-        )}
+        {loading ? <Skeleton className="h-7 w-16 mt-1" /> : <p className="text-2xl font-bold leading-tight mt-0.5">{value}</p>}
         {sub && !loading && <p className="text-[11px] text-muted-foreground mt-0.5">{sub}</p>}
       </div>
     </div>
@@ -39,6 +35,7 @@ function StatCard({ label, value, sub, icon: Icon, color, loading }: {
 
 function MacroBar({ label, value, target, color }: { label: string; value: number; target: number; color: string }) {
   const pct = Math.min(100, Math.round((value / target) * 100));
+  const bg = color.replace("text-", "bg-");
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-xs">
@@ -46,13 +43,7 @@ function MacroBar({ label, value, target, color }: { label: string; value: numbe
         <span className="font-semibold"><span className={color}>{Math.round(value)}g</span><span className="text-muted-foreground">/{target}g</span></span>
       </div>
       <div className="h-1.5 rounded-full bg-muted/20 overflow-hidden">
-        <motion.div
-          key={pct}
-          className={`h-full rounded-full ${color.replace("text-", "bg-")}`}
-          initial={{ width: "0%" }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-        />
+        <div className={`h-full rounded-full transition-all duration-700 ease-out ${bg}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
   );
@@ -71,21 +62,19 @@ export function DashboardPage() {
 
   const today = format(new Date(), "EEEE, MMMM d");
   const caloriePct = Math.min(100, ((stats?.totalCaloriesConsumedToday ?? 0) / CALORIE_TARGET) * 100);
+  const goalPct = stats?.goalProgress ?? 0;
 
   return (
     <AppLayout>
       <PageTransition>
         <div className="space-y-6">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
               <p className="text-xs text-muted-foreground font-semibold uppercase tracking-widest">{today}</p>
               {profileLoading ? (
                 <Skeleton className="h-8 w-52 mt-1" />
               ) : (
-                <h1 className="text-2xl font-bold tracking-tight mt-0.5">
-                  Hey, {profile?.name?.split(" ")[0]} 👋
-                </h1>
+                <h1 className="text-2xl font-bold tracking-tight mt-0.5">Hey, {profile?.name?.split(" ")[0]} 👋</h1>
               )}
             </div>
             <Link href="/workouts">
@@ -95,32 +84,14 @@ export function DashboardPage() {
             </Link>
           </div>
 
-          {/* Stat Cards */}
           <StaggerList className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StaggerItem>
-              <StatCard label="Streak" value={`${stats?.workoutStreak ?? 0}d`} sub="days in a row" icon={Flame} color="text-primary" loading={statsLoading} />
-            </StaggerItem>
-            <StaggerItem>
-              <StatCard label="Sessions Today" value={stats?.totalWorkoutsToday ?? 0} sub={`${stats?.totalWorkoutsThisWeek ?? 0} this week`} icon={Zap} color="text-blue-400" loading={statsLoading} />
-            </StaggerItem>
-            <StaggerItem>
-              <StatCard label="Burned Today" value={`${stats?.totalCaloriesBurnedToday ?? 0}`} sub="kcal active" icon={TrendingUp} color="text-rose-400" loading={statsLoading} />
-            </StaggerItem>
-            <StaggerItem>
-              <StatCard
-                label="Weight"
-                value={`${stats?.currentWeightKg ?? profile?.weightKg ?? "—"} kg`}
-                sub="latest log"
-                icon={Scale}
-                color="text-muted-foreground"
-                loading={statsLoading || profileLoading}
-              />
-            </StaggerItem>
+            <StaggerItem><StatCard label="Streak" value={`${stats?.workoutStreak ?? 0}d`} sub="days in a row" icon={Flame} color="text-primary" loading={statsLoading} /></StaggerItem>
+            <StaggerItem><StatCard label="Sessions Today" value={stats?.totalWorkoutsToday ?? 0} sub={`${stats?.totalWorkoutsThisWeek ?? 0} this week`} icon={Zap} color="text-blue-400" loading={statsLoading} /></StaggerItem>
+            <StaggerItem><StatCard label="Burned Today" value={stats?.totalCaloriesBurnedToday ?? 0} sub="kcal active" icon={TrendingUp} color="text-rose-400" loading={statsLoading} /></StaggerItem>
+            <StaggerItem><StatCard label="Weight" value={`${stats?.currentWeightKg ?? profile?.weightKg ?? "—"} kg`} sub="latest log" icon={Scale} color="text-muted-foreground" loading={statsLoading || profileLoading} /></StaggerItem>
           </StaggerList>
 
-          {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            {/* Recent Workouts - 3 cols */}
             <Card className="lg:col-span-3 bg-card/20 border-border/30">
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <div>
@@ -133,16 +104,12 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent>
                 {workoutsLoading ? (
-                  <div className="space-y-2.5">
-                    {[1, 2, 3].map(i => <Skeleton key={i} className="h-14 rounded-xl" />)}
-                  </div>
-                ) : !workouts || workouts.length === 0 ? (
+                  <div className="space-y-2.5">{[1, 2, 3].map(i => <Skeleton key={i} className="h-14 rounded-xl" />)}</div>
+                ) : !workouts?.length ? (
                   <div className="text-center py-10 text-muted-foreground border border-dashed border-border/30 rounded-xl">
                     <Activity className="h-7 w-7 mx-auto mb-2 opacity-30" />
                     <p className="text-sm">No sessions yet</p>
-                    <Button variant="link" className="text-primary text-xs mt-1 h-auto p-0" onClick={() => setLocation("/workouts")}>
-                      Log your first workout
-                    </Button>
+                    <Button variant="link" className="text-primary text-xs mt-1 h-auto p-0" onClick={() => setLocation("/workouts")}>Log your first workout</Button>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -169,7 +136,6 @@ export function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Nutrition Panel - 2 cols */}
             <div className="lg:col-span-2 space-y-4">
               <Card className="bg-card/20 border-border/30">
                 <CardHeader className="pb-3 flex flex-row items-center justify-between">
@@ -188,18 +154,14 @@ export function DashboardPage() {
                     <div className="space-y-3"><Skeleton className="h-20 w-20 rounded-full mx-auto" /></div>
                   ) : (
                     <div className="space-y-4">
-                      {/* Calorie ring */}
                       <div className="flex items-center gap-4">
                         <div className="relative w-20 h-20 shrink-0">
                           <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="38" fill="transparent" stroke="currentColor" strokeWidth="10" className="text-muted/15" />
                             <motion.circle
-                              cx="50" cy="50" r="38"
-                              fill="transparent"
-                              stroke="currentColor"
-                              strokeWidth="10"
-                              strokeLinecap="round"
-                              strokeDasharray="238.6"
+                              key={stats?.totalCaloriesConsumedToday}
+                              cx="50" cy="50" r="38" fill="transparent" stroke="currentColor" strokeWidth="10"
+                              strokeLinecap="round" strokeDasharray="238.6"
                               initial={{ strokeDashoffset: 238.6 }}
                               animate={{ strokeDashoffset: 238.6 - (caloriePct / 100) * 238.6 }}
                               transition={{ duration: 0.9, ease: "easeOut" }}
@@ -226,8 +188,6 @@ export function DashboardPage() {
                           </div>
                         </div>
                       </div>
-
-                      {/* Macro bars */}
                       <div className="space-y-2.5 pt-2 border-t border-border/20">
                         <MacroBar label="Protein" value={stats?.totalProteinToday ?? 0} target={PROTEIN_TARGET} color="text-blue-400" />
                         <MacroBar label="Carbs" value={stats?.totalCarbsToday ?? 0} target={CARBS_TARGET} color="text-amber-400" />
@@ -238,7 +198,6 @@ export function DashboardPage() {
                 </CardContent>
               </Card>
 
-              {/* Weekly goal */}
               <Card className="bg-card/20 border-border/30">
                 <CardContent className="py-4 px-4">
                   <div className="flex justify-between items-center mb-2">
@@ -246,20 +205,12 @@ export function DashboardPage() {
                       <Target className="h-3.5 w-3.5 text-primary" />
                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Weekly Goal</span>
                     </div>
-                    <span className="text-xs font-bold text-primary">{stats?.goalProgress ?? 0}%</span>
+                    <span className="text-xs font-bold text-primary">{goalPct}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
-                    <motion.div
-                      key={stats?.goalProgress ?? "loading"}
-                      className="h-full rounded-full bg-primary"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${stats?.goalProgress ?? 0}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                    />
+                    <div className="h-full rounded-full bg-primary transition-all duration-700 ease-out" style={{ width: `${goalPct}%` }} />
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-2">
-                    {stats?.totalWorkoutsThisWeek ?? 0} / 5 workouts this week
-                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-2">{stats?.totalWorkoutsThisWeek ?? 0} / 5 workouts this week</p>
                 </CardContent>
               </Card>
             </div>
