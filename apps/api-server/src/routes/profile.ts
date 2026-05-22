@@ -21,7 +21,10 @@ router.get("/profile", requireAuth, async (req: any, res) => {
       .from(profilesTable)
       .where(eq(profilesTable.clerkUserId, req.userId))
       .limit(1);
-    if (!profile) return res.status(404).json({ error: "Profile not found" });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found" });
+      return;
+    }
     res.json(profile);
   } catch (err) {
     req.log.error({ err }, "Failed to get profile");
@@ -51,7 +54,10 @@ router.patch("/profile", requireAuth, async (req: any, res) => {
       .set(body)
       .where(eq(profilesTable.clerkUserId, req.userId))
       .returning();
-    if (!profile) return res.status(404).json({ error: "Profile not found" });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found" });
+      return;
+    }
     res.json(profile);
   } catch (err) {
     req.log.error({ err }, "Failed to update profile");
