@@ -58,7 +58,7 @@ export function OnboardingPage() {
           queryClient.invalidateQueries({ queryKey: getGetProfileQueryKey() });
           toast({
             title: "Profile setup complete",
-            description: "Welcome to FitTrack. Let's get to work.",
+            description: "Welcome to ApexTrak. Let's get to work.",
           });
           setLocation("/dashboard");
         },

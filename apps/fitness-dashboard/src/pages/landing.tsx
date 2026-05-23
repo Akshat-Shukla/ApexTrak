@@ -16,7 +16,7 @@ export function LandingPage() {
       <header className="px-6 py-6 flex items-center justify-between z-10">
         <div className="flex items-center gap-2 font-bold text-2xl tracking-tight">
           <Activity className="h-7 w-7 text-primary" />
-          <span>FitTrack</span>
+          <span>ApexTrak</span>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/sign-in">
