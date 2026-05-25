@@ -1,5 +1,5 @@
 import { useGetDashboardStats, useGetProfile, useListWorkouts } from "@fitness/api-client-react";
-import { Activity, Flame, Target, TrendingUp, Plus, Calendar, Clock, Utensils, Zap, Scale } from "lucide-react";
+import { Activity, Flame, Target, TrendingUp, Plus, Calendar, Clock, Utensils, Zap, Scale, Droplet, Dumbbell } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -14,6 +14,21 @@ const CALORIE_TARGET = 2000;
 const PROTEIN_TARGET = 150;
 const CARBS_TARGET = 250;
 const FAT_TARGET = 65;
+
+const WORKOUT_TYPES = [
+  { value: "running", icon: Flame, color: "text-rose-400", bg: "bg-rose-500/10" },
+  { value: "cycling", icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10" },
+  { value: "swimming", icon: Droplet, color: "text-blue-400", bg: "bg-blue-500/10" },
+  { value: "weightlifting", icon: Dumbbell, color: "text-primary", bg: "bg-primary/10" },
+  { value: "yoga", icon: Activity, color: "text-purple-400", bg: "bg-purple-500/10" },
+  { value: "hiit", icon: Flame, color: "text-orange-400", bg: "bg-orange-500/10" },
+  { value: "walking", icon: Activity, color: "text-teal-400", bg: "bg-teal-500/10" },
+  { value: "other", icon: TrendingUp, color: "text-muted-foreground", bg: "bg-muted/20" },
+];
+
+function getWorkoutMeta(type: string) {
+  return WORKOUT_TYPES.find(w => w.value === type) ?? WORKOUT_TYPES[7];
+}
 
 function StatCard({ label, value, sub, icon: Icon, color, loading }: {
   label: string; value: string | number; sub?: string;
@@ -112,24 +127,27 @@ export function DashboardPage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {workouts.map(w => (
-                      <div key={w.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-background/30 hover:bg-white/4 transition-colors">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                          <Activity className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold capitalize">{w.type.replace("_", " ")}</p>
-                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                            <span className="flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{format(new Date(w.date), "MMM d")}</span>
-                            <span className="flex items-center gap-1"><Clock className="h-2.5 w-2.5" />{w.durationMinutes}m</span>
+                    {workouts.map(w => {
+                      const meta = getWorkoutMeta(w.type);
+                      return (
+                        <div key={w.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-background/30 hover:bg-white/4 transition-colors">
+                          <div className={`h-8 w-8 rounded-lg ${meta.bg} flex items-center justify-center shrink-0`}>
+                            <meta.icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold capitalize">{w.type.replace("_", " ")}</p>
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                              <span className="flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{format(new Date(w.date), "MMM d")}</span>
+                              <span className="flex items-center gap-1"><Clock className="h-2.5 w-2.5" />{w.durationMinutes}m</span>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className={`text-sm font-bold ${meta.color}`}>{w.caloriesBurned}</span>
+                            <span className="text-[10px] text-muted-foreground ml-0.5">kcal</span>
                           </div>
                         </div>
-                        <div className="text-right shrink-0">
-                          <span className="text-sm font-bold text-primary">{w.caloriesBurned}</span>
-                          <span className="text-[10px] text-muted-foreground ml-0.5">kcal</span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
