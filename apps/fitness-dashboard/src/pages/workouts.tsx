@@ -304,7 +304,7 @@ export function WorkoutsPage() {
                         <div className="text-[10px] text-muted-foreground uppercase tracking-wider">kcal</div>
                       </div>
                       <button
-                        className="absolute right-3 top-3 h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
+                        className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
                         onClick={() => handleDelete(workout.id)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
